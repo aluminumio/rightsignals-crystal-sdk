@@ -4,7 +4,7 @@ crystal: ">= 1.10.0"
 license: MIT
 
 authors:
-  - Aluminum IO <support@rightsignals.com>
+  - RightSignals Support <support@rightsignals.com>
 
 description: Crystal SDK for the RightSignals API
 
