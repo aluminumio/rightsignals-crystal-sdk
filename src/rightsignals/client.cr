@@ -61,12 +61,29 @@ module RightSignals
       EventDetail.from_json(get("/api/v1/events/#{id}"))
     end
 
+    def resolve_issue(id : Int64) : IssueSummary
+      IssueSummary.from_json(patch("/api/v1/issues/#{id}", {"status" => "resolved"}))
+    end
+
+    def reopen_issue(id : Int64) : IssueSummary
+      IssueSummary.from_json(patch("/api/v1/issues/#{id}", {"status" => "open"}))
+    end
+
     private def get(path : String, params : URI::Params = URI::Params.new) : String
       uri = URI.parse(base_url)
       uri.path = path
       uri.query = params.to_s unless params.empty?
 
       response = HTTP::Client.get(uri, headers: auth_headers)
+      handle_response(response)
+    end
+
+    private def patch(path : String, body : Hash) : String
+      uri = URI.parse(base_url)
+      uri.path = path
+      headers = auth_headers
+      headers["Content-Type"] = "application/json"
+      response = HTTP::Client.patch(uri, headers: headers, body: body.to_json)
       handle_response(response)
     end
 
