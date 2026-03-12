@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: crystal-lang/install-crystal@v1
+      - uses: actions/checkout@v5
+      - uses: aluminumio/install-crystal@master
       - run: shards install
       - run: crystal spec
