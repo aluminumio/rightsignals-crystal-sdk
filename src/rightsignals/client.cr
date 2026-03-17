@@ -10,9 +10,9 @@ module RightSignals
     def initialize(@base_url : String = "https://app.rightsignals.com", @token : String = "")
     end
 
-    def list_traces(service_id : Int64? = nil, environment : String? = nil, limit : Int32? = nil) : Array(TraceSummary)
+    def list_traces(service : String? = nil, environment : String? = nil, limit : Int32? = nil) : Array(TraceSummary)
       params = URI::Params.new
-      params["service_id"] = service_id.to_s if service_id
+      params["service"] = service if service
       params["environment"] = environment if environment
       params["limit"] = limit.to_s if limit
       Array(TraceSummary).from_json(get("/api/v1/traces", params))
@@ -22,9 +22,9 @@ module RightSignals
       TraceDetail.from_json(get("/api/v1/traces/#{id}"))
     end
 
-    def list_issues(service_id : Int64? = nil, environment : String? = nil, status : String? = nil, limit : Int32? = nil) : Array(IssueSummary)
+    def list_issues(service : String? = nil, environment : String? = nil, status : String? = nil, limit : Int32? = nil) : Array(IssueSummary)
       params = URI::Params.new
-      params["service_id"] = service_id.to_s if service_id
+      params["service"] = service if service
       params["environment"] = environment if environment
       params["status"] = status if status
       params["limit"] = limit.to_s if limit
@@ -35,9 +35,9 @@ module RightSignals
       IssueDetail.from_json(get("/api/v1/issues/#{id}"))
     end
 
-    def list_occurrences(service_id : Int64? = nil, environment : String? = nil, exception_type : String? = nil, limit : Int32? = nil) : Array(OccurrenceSummary)
+    def list_occurrences(service : String? = nil, environment : String? = nil, exception_type : String? = nil, limit : Int32? = nil) : Array(OccurrenceSummary)
       params = URI::Params.new
-      params["service_id"] = service_id.to_s if service_id
+      params["service"] = service if service
       params["environment"] = environment if environment
       params["exception_type"] = exception_type if exception_type
       params["limit"] = limit.to_s if limit
@@ -48,9 +48,9 @@ module RightSignals
       OccurrenceDetail.from_json(get("/api/v1/occurrences/#{id}"))
     end
 
-    def list_events(service_id : Int64? = nil, prompt_id : String? = nil, user_email : String? = nil, limit : Int32? = nil) : Array(EventSummary)
+    def list_events(service : String? = nil, prompt_id : String? = nil, user_email : String? = nil, limit : Int32? = nil) : Array(EventSummary)
       params = URI::Params.new
-      params["service_id"] = service_id.to_s if service_id
+      params["service"] = service if service
       params["prompt_id"] = prompt_id if prompt_id
       params["user_email"] = user_email if user_email
       params["limit"] = limit.to_s if limit
