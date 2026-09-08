@@ -4,10 +4,16 @@ describe RightSignals::TraceSummary do
   it "deserializes from JSON" do
     json = %|{"id":1,"trace_id":"abc123","service":"my-svc","environment":"production","release":"1.0","root_span":"GET /users","duration":"1.5s","span_count":5,"started_at":"2026-03-11T10:00:00Z"}|
     trace = RightSignals::TraceSummary.from_json(json)
-    trace.id.should eq 1
+    trace.id.should eq "1"
     trace.trace_id.should eq "abc123"
     trace.service.should eq "my-svc"
     trace.span_count.should eq 5
+  end
+
+  it "deserializes a UUID id" do
+    json = %|{"id":"01a07f27-f10c-7c11-abe6-0d964f9f10e9","trace_id":"abc123","service":"my-svc","span_count":5}|
+    trace = RightSignals::TraceSummary.from_json(json)
+    trace.id.should eq "01a07f27-f10c-7c11-abe6-0d964f9f10e9"
   end
 
   it "handles nil optional fields" do
@@ -22,11 +28,23 @@ describe RightSignals::IssueSummary do
   it "deserializes from JSON" do
     json = %|{"id":2,"summary":"RuntimeError: boom","exception_type":"RuntimeError","service":"svc","environment":"prod","status":"open","regressed":false,"occurrence_count":3,"first_release":"1.0","last_release":"1.1","first_seen_at":"2026-03-10T10:00:00Z","last_seen_at":"2026-03-11T10:00:00Z"}|
     issue = RightSignals::IssueSummary.from_json(json)
-    issue.id.should eq 2
+    issue.id.should eq "2"
     issue.exception_type.should eq "RuntimeError"
     issue.status.should eq "open"
     issue.regressed.should eq false
     issue.occurrence_count.should eq 3
+  end
+
+  it "deserializes a UUID id" do
+    json = %|{"id":"019fba62-5867-7c79-9622-2d6c8ea12d73","summary":"boom","exception_type":"RuntimeError","service":"svc","status":"open","regressed":false,"occurrence_count":1}|
+    issue = RightSignals::IssueSummary.from_json(json)
+    issue.id.should eq "019fba62-5867-7c79-9622-2d6c8ea12d73"
+  end
+
+  it "round-trips an id back to JSON as a string" do
+    json = %|{"id":"019fba62-5867-7c79-9622-2d6c8ea12d73","summary":"boom","exception_type":"RuntimeError","service":"svc","status":"open","regressed":false,"occurrence_count":1}|
+    issue = RightSignals::IssueSummary.from_json(json)
+    issue.to_json.should contain %|"id":"019fba62-5867-7c79-9622-2d6c8ea12d73"|
   end
 end
 
@@ -38,6 +56,30 @@ describe RightSignals::IssueDetail do
     issue.recent_occurrences.size.should eq 1
     issue.recent_occurrences[0].message.should eq "boom"
   end
+
+  it "deserializes UUID ids in nested occurrences" do
+    json = %|{"id":"01a0778b-2006-79e1-8559-0b98348c2f51","summary":"RuntimeError","exception_type":"RuntimeError","service":"svc","status":"open","regressed":false,"occurrence_count":1,"recent_occurrences":[{"id":"01a07f38-0170-7355-a3bf-e351190baa7e","exception_type":"RuntimeError","trace_id":"01a07f3a-3059-7900-b060-1de1874dbb96"}]}|
+    issue = RightSignals::IssueDetail.from_json(json)
+    issue.id.should eq "01a0778b-2006-79e1-8559-0b98348c2f51"
+    issue.recent_occurrences[0].id.should eq "01a07f38-0170-7355-a3bf-e351190baa7e"
+    issue.recent_occurrences[0].trace_id.should eq "01a07f3a-3059-7900-b060-1de1874dbb96"
+  end
+
+  it "leaves an absent nested trace_id nil" do
+    json = %|{"id":"01a0778b-2006-79e1-8559-0b98348c2f51","summary":"E","exception_type":"E","service":"svc","status":"open","regressed":false,"occurrence_count":1,"recent_occurrences":[{"id":"01a07f38-0170-7355-a3bf-e351190baa7e","exception_type":"E","trace_id":null}]}|
+    issue = RightSignals::IssueDetail.from_json(json)
+    issue.recent_occurrences[0].trace_id.should be_nil
+  end
+end
+
+describe RightSignals::OccurrenceSummary do
+  it "deserializes UUID ids" do
+    json = %|{"id":"01a07f38-0170-7355-a3bf-e351190baa7e","exception_type":"Net::OpenTimeout","message":"boom","service":"softcover","issue_id":"01a04372-5249-7812-8847-85dda3afc509","issue_summary":"Net::OpenTimeout","trace_id":"01a07f3a-3059-7900-b060-1de1874dbb96","occurred_at":"2026-09-08T10:00:00Z"}|
+    occ = RightSignals::OccurrenceSummary.from_json(json)
+    occ.id.should eq "01a07f38-0170-7355-a3bf-e351190baa7e"
+    occ.issue_id.should eq "01a04372-5249-7812-8847-85dda3afc509"
+    occ.trace_id.should eq "01a07f3a-3059-7900-b060-1de1874dbb96"
+  end
 end
 
 describe RightSignals::TraceDetail do
@@ -47,6 +89,13 @@ describe RightSignals::TraceDetail do
     trace.spans.size.should eq 1
     trace.spans[0].operation.should eq "GET /"
   end
+
+  it "deserializes UUID ids in span occurrences" do
+    json = %|{"id":"01a07f6e-613c-7407-b5cc-78324ead7e33","trace_id":"abc","service":"svc","span_count":1,"spans":[{"span_id":"s1","operation":"GET /","occurrences":[{"id":"01a07f38-0170-7355-a3bf-e351190baa7e","exception_type":"RuntimeError","message":"boom"}]}]}|
+    trace = RightSignals::TraceDetail.from_json(json)
+    trace.id.should eq "01a07f6e-613c-7407-b5cc-78324ead7e33"
+    trace.spans[0].occurrences.not_nil![0].id.should eq "01a07f38-0170-7355-a3bf-e351190baa7e"
+  end
 end
 
 describe RightSignals::EventSummary do
@@ -55,6 +104,21 @@ describe RightSignals::EventSummary do
     event = RightSignals::EventSummary.from_json(json)
     event.event_name.should eq "api_request"
     event.user_email.should eq "test@example.com"
+  end
+
+  it "deserializes a UUID id" do
+    json = %|{"id":"01a07f38-0170-7355-a3bf-e351190baa7e","event_name":"api_request","service":"cowork"}|
+    event = RightSignals::EventSummary.from_json(json)
+    event.id.should eq "01a07f38-0170-7355-a3bf-e351190baa7e"
+  end
+end
+
+describe RightSignals::IdConverter do
+  it "rejects a type that is neither string nor int" do
+    json = %|{"id":{"nested":true},"trace_id":"abc","service":"svc","span_count":1}|
+    expect_raises(JSON::ParseException) do
+      RightSignals::TraceSummary.from_json(json)
+    end
   end
 end
 

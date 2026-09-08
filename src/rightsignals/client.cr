@@ -18,7 +18,7 @@ module RightSignals
       Array(TraceSummary).from_json(get("/api/v1/traces", params))
     end
 
-    def get_trace(id : Int64) : TraceDetail
+    def get_trace(id : String) : TraceDetail
       TraceDetail.from_json(get("/api/v1/traces/#{id}"))
     end
 
@@ -31,7 +31,7 @@ module RightSignals
       Array(IssueSummary).from_json(get("/api/v1/issues", params))
     end
 
-    def get_issue(id : Int64) : IssueDetail
+    def get_issue(id : String) : IssueDetail
       IssueDetail.from_json(get("/api/v1/issues/#{id}"))
     end
 
@@ -44,7 +44,7 @@ module RightSignals
       Array(OccurrenceSummary).from_json(get("/api/v1/occurrences", params))
     end
 
-    def get_occurrence(id : Int64) : OccurrenceDetail
+    def get_occurrence(id : String) : OccurrenceDetail
       OccurrenceDetail.from_json(get("/api/v1/occurrences/#{id}"))
     end
 
@@ -57,15 +57,15 @@ module RightSignals
       Array(EventSummary).from_json(get("/api/v1/events", params))
     end
 
-    def get_event(id : Int64) : EventDetail
+    def get_event(id : String) : EventDetail
       EventDetail.from_json(get("/api/v1/events/#{id}"))
     end
 
-    def resolve_issue(id : Int64) : IssueSummary
+    def resolve_issue(id : String) : IssueSummary
       IssueSummary.from_json(patch("/api/v1/issues/#{id}", {"status" => "resolved"}))
     end
 
-    def reopen_issue(id : Int64) : IssueSummary
+    def reopen_issue(id : String) : IssueSummary
       IssueSummary.from_json(patch("/api/v1/issues/#{id}", {"status" => "open"}))
     end
 
