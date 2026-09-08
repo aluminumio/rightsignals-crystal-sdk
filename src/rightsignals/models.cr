@@ -1,7 +1,8 @@
 module RightSignals
   struct TraceSummary
     include JSON::Serializable
-    property id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property id : String
     property trace_id : String
     property service : String
     property environment : String?
@@ -32,14 +33,16 @@ module RightSignals
 
   struct OccurrenceRef
     include JSON::Serializable
-    property id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property id : String
     property exception_type : String
     property message : String?
   end
 
   struct TraceDetail
     include JSON::Serializable
-    property id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property id : String
     property trace_id : String
     property service : String
     property environment : String?
@@ -54,7 +57,8 @@ module RightSignals
 
   struct IssueSummary
     include JSON::Serializable
-    property id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property id : String
     property summary : String
     property exception_type : String
     property service : String
@@ -70,17 +74,20 @@ module RightSignals
 
   struct RecentOccurrence
     include JSON::Serializable
-    property id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property id : String
     property exception_type : String
     property message : String?
     property release : String?
-    property trace_id : Int64?
+    @[JSON::Field(converter: RightSignals::NilableIdConverter)]
+    property trace_id : String?
     property occurred_at : String?
   end
 
   struct IssueDetail
     include JSON::Serializable
-    property id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property id : String
     property summary : String
     property exception_type : String
     property service : String
@@ -98,29 +105,35 @@ module RightSignals
 
   struct OccurrenceSummary
     include JSON::Serializable
-    property id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property id : String
     property exception_type : String
     property message : String?
     property service : String
     property environment : String?
     property release : String?
-    property issue_id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property issue_id : String
     property issue_summary : String
-    property trace_id : Int64?
+    @[JSON::Field(converter: RightSignals::NilableIdConverter)]
+    property trace_id : String?
     property occurred_at : String?
   end
 
   struct OccurrenceDetail
     include JSON::Serializable
-    property id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property id : String
     property exception_type : String
     property message : String?
     property service : String
     property environment : String?
     property release : String?
-    property issue_id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property issue_id : String
     property issue_summary : String
-    property trace_id : Int64?
+    @[JSON::Field(converter: RightSignals::NilableIdConverter)]
+    property trace_id : String?
     property occurred_at : String?
     property stack_trace : String?
     property attributes : JSON::Any?
@@ -129,7 +142,8 @@ module RightSignals
 
   struct EventSummary
     include JSON::Serializable
-    property id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property id : String
     property event_name : String?
     property service : String
     property release : String?
@@ -141,7 +155,8 @@ module RightSignals
 
   struct EventDetail
     include JSON::Serializable
-    property id : Int64
+    @[JSON::Field(converter: RightSignals::IdConverter)]
+    property id : String
     property event_name : String?
     property service : String
     property release : String?
